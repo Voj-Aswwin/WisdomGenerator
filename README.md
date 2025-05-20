@@ -1,15 +1,17 @@
 # WisdomGenerator
-Tool to parse my subscribed newsletters and draw out useful insights from it.
+Tool to parse subscribed newsletters and draw out useful insights using Gemini AI.
 
 ## Overview
 WisdomGenerator is a tool that:
-1. Fetches newsletters from your Gmail account (from 12 PM yesterday to 12 PM today)
+1. Fetches newsletters from your Gmail account (from yesterday to today)
 2. Processes them to extract key insights using Gemini AI
 3. Generates daily insights for each newsletter
 4. Creates a comprehensive weekly summary on Sundays
 
 ## Supported Newsletter Sources
 - newsletters@techcrunch.com
+- newsletter@businessmint.com
+- newsletter@inc42emails.com
 - newsletters@yourstory.com
 - thedailybriefing@substack.com
 - dailybrief@cfr.org

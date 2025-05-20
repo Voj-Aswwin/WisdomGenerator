@@ -1,0 +1,9 @@
+{
+  "name": "wisdom-generator",
+  "version": "1.0.0",
+  "description": "Wisdom Generator Landing Page",
+  "main": "index.html",
+  "dependencies": {
+    "@magicuidesign/magicui": "latest"
+  }
+}

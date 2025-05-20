@@ -1,6 +1,6 @@
 # main.py
 from agents.extractor import fetch_and_save_newsletters
-from agents.insights_generator import process_daily_newsletters, generate_weekly_summary
+from agents.insights_generator import process_daily_newsletters
 import os
 from datetime import datetime, timedelta
 
@@ -18,17 +18,24 @@ if __name__ == "__main__":
     after_date = yesterday.strftime("%Y/%m/%d")
     
     # Fetch newsletters with query
-    query = f"(from:newsletters@techcrunch.com OR from:newsletters@yourstory.com OR from:thedailybriefing@substack.com OR from:dailybrief@cfr.org) (category:primary OR category:updates) after:{after_date}"
+    query = f"""(from:newsletters@techcrunch.com OR 
+        from:newsletter@businessmint.com OR 
+        from:newsletter@inc42emails.com OR 
+        from:newsletters@yourstory.com OR 
+        from:thedailybriefing@substack.com OR 
+        from:geopoliticsreport@substack.com OR 
+        from:dailybrief@cfr.org) 
+        (category:primary OR category:updates) after:{after_date}"""
+    
+    print(f"Executing query: {query}")
+    
     messages = fetch_and_save_newsletters(
         query=query,
-        max_results=10
+        max_results=15
     )
     
     # Process newsletters and generate insights
     if messages:
         process_daily_newsletters(messages=messages)
-        
-        # Generate weekly summary (only runs on Sundays)
-        generate_weekly_summary()
     else:
         print("No newsletters found to process for insights.")

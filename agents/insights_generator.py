@@ -84,22 +84,29 @@ def process_newsletter_for_insights(email_id):
     # Generate insights using LLM
     print(f"Calling Gemini LLM for: {subject} ({date})")
     prompt = f"""
-    You are an expert at extracting valuable insights from tech newsletters.
-    
-    Newsletter: {subject}
+    You are a professional newsletter analyst.
+    Your task is to extract 3 to 5 concise, high-value insights from the following newsletter.
+
+    Newsletter Metadata:
+
+    Subject: {subject}
     From: {sender}
     Date: {date}
-    
+
     Content:
     {content_to_send}
-    
-    Extract 3-5 key insights from this newsletter. Focus on:
-    1. Important news or announcements
-    2. Industry trends
-    3. Actionable information
-    4. Surprising or counterintuitive findings
-    
-    Format each insight as a brief, clear bullet point.
+
+    Focus on extracting:
+    Major news, updates, or announcements
+    Emerging industry trends or shifts
+    Actionable advice or recommendations
+    Surprising data points or counterintuitive findings
+
+    Format:
+
+    Use bullet points
+    Each point should be brief, clear, and informative
+    Avoid fluff—focus on what's most useful or insightful
     """
     insights = get_gemini_response(prompt)
     print(f"Gemini LLM call complete for: {subject} ({date})")
@@ -154,75 +161,135 @@ def process_daily_newsletters(messages=None, query=None, max_results=5):
     print(f"Saved {len(daily_insights)} newsletter insights for {today}")
     return daily_insights
 
-def generate_weekly_summary():
-    """Generate a weekly summary of insights (run on Sundays)."""
-    # Check if today is Sunday
-    if datetime.now().weekday() != 6:  # 0 is Monday, 6 is Sunday
-        print("Weekly summary generation is only run on Sundays.")
-        return None
+def analyze_insights_trends():
+    """Analyze all daily insights and identify patterns and emerging trends."""
+    # Find all daily insight files
+    insight_files = glob.glob(os.path.join(DAILY_INSIGHTS_DIR, "*.json"))
     
-    # Get insights from the past 7 days
-    end_date = datetime.now()
-    start_date = end_date - timedelta(days=7)
+    if not insight_files:
+        print("No insight files found to analyze.")
+        return "No insights available for analysis"
     
-    all_insights = []
-    current_date = start_date
-    while current_date <= end_date:
-        date_str = current_date.strftime("%Y-%m-%d")
-        insights_file = os.path.join(DAILY_INSIGHTS_DIR, f"{date_str}.json")
-        
-        if os.path.exists(insights_file):
-            with open(insights_file, 'r', encoding='utf-8') as f:
-                daily_insights = json.load(f)
-                all_insights.extend(daily_insights)
-        
-        current_date += timedelta(days=1)
+    # Combine insights from all files
+    combined_insights = []
+    for file_path in insight_files:
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                insights = json.load(f)
+                combined_insights.extend(insights)
+        except Exception as e:
+            print(f"Error reading file {file_path}: {e}")
     
-    if not all_insights:
-        print("No insights found for the past week.")
-        return None
+    # Format the combined content for the LLM
+    combined_content = json.dumps(combined_insights, indent=2)
     
-    # Prepare data for the LLM
-    insights_text = json.dumps(all_insights, indent=2)
-    
-    # Generate weekly summary
+    # Create prompt for trend analysis - requesting HTML-formatted response
     prompt = f"""
-    You are an expert at synthesizing information and identifying trends.
+    I have some newsletters with me. Collect me some insights on them.
+    I don't want plain summaries. I want you to go deep, find patterns across multiple newsletters, and give me key emerging trends you notice.
+
+    ✅ Avoid generic, overused statements like "AI is changing the world." Instead, explain specifically how such trends are unfolding—whether through new business models, shifts in user behavior, regulatory changes, or technological advancements.
+
+    ✅ Format your response with HTML tags for better display:
+    - Use <h1>, <h2>, <h3> tags for section headers
+    - Use <p> tags for paragraphs
+    - Use <b> or <strong> tags for important points
+    - Use <ul> and <li> tags for bullet points
+    - Use <blockquote> for notable quotes or highlights
     
-    Below are insights extracted from tech newsletters over the past week:
-    
-    {insights_text}
-    
-    Please create a comprehensive weekly summary that:
-    1. Identifies the most important themes and trends
-    2. Highlights significant news or announcements
-    3. Notes any contradictions or confirmations across different sources
-    4. Provides strategic takeaways for someone in the tech industry
-    
-    Format the summary with clear sections, bullet points where appropriate, and a "Key Takeaways" section at the end.
+    Structure your output clearly:
+    - Start with a "TL;DR" section summarizing the key insights in 4–6 sentences.
+    - Then go into detailed analysis using clear section headers.
+    - Use bullet points only when citing specific facts, numbers, or data points.
+    - End with a summary of the key trends for quick reference.
+
+    Be analytical, connect the dots across sectors, and highlight what's genuinely new or noteworthy—not what's obvious or widely known.
+
+    Newsletters:
+    {combined_content}
     """
     
-    weekly_summary = get_gemini_response(prompt, model_name="gemini-2.0-pro")
+    # Generate analysis using Gemini
+    analysis = get_gemini_response(prompt, model_name="gemini-2.0-flash")
     
-    # Save weekly summary
-    week_end = datetime.now().strftime("%Y-%m-%d")
-    week_start = (datetime.now() - timedelta(days=6)).strftime("%Y-%m-%d")
-    summary_file = os.path.join(WEEKLY_INSIGHTS_DIR, f"{week_start}_to_{week_end}.md")
+    # Save the analysis as HTML
+    today = datetime.now().strftime("%Y-%m-%d")
+    analysis_file = os.path.join(INSIGHTS_DIR, f"trends_analysis_{today}.html")
     
-    with open(summary_file, 'w', encoding='utf-8') as f:
-        f.write(f"# Weekly Tech Insights: {week_start} to {week_end}\n\n")
-        f.write(weekly_summary)
+    with open(analysis_file, 'w', encoding='utf-8') as f:
+        # Add basic styling to the HTML content
+        styled_html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Newsletter Trends Analysis: {today}</title>
+            <style>
+                body {{
+                    font-family: Arial, sans-serif;
+                    line-height: 1.6;
+                    max-width: 800px;
+                    margin: 0 auto;
+                    padding: 20px;
+                    color: #333;
+                }}
+                h1 {{
+                    color: #4a148c;
+                    font-size: 2em;
+                    margin-top: 1.2em;
+                    margin-bottom: 0.6em;
+                    border-bottom: 2px solid #e0e0e0;
+                    padding-bottom: 0.3em;
+                }}
+                h2 {{
+                    color: #1a237e;
+                    font-size: 1.5em;
+                    margin-top: 1em;
+                    margin-bottom: 0.5em;
+                }}
+                h3 {{
+                    color: #0d47a1;
+                    font-size: 1.2em;
+                    margin-top: 0.8em;
+                    margin-bottom: 0.4em;
+                }}
+                p {{
+                    margin-bottom: 1em;
+                }}
+                ul, ol {{
+                    margin-bottom: 1em;
+                    padding-left: 2em;
+                }}
+                li {{
+                    margin-bottom: 0.5em;
+                }}
+                blockquote {{
+                    border-left: 4px solid #bbdefb;
+                    margin: 1em 0;
+                    padding: 0.5em 1em;
+                    background-color: #e3f2fd;
+                    font-style: italic;
+                }}
+                strong, b {{
+                    color: #000;
+                }}
+            </style>
+        </head>
+        <body>
+            <h1>Newsletter Trends Analysis: {today}</h1>
+            {analysis}
+        </body>
+        </html>
+        """
+        f.write(styled_html)
     
-    print(f"Weekly summary saved to {summary_file}")
-    return weekly_summary
+    print(f"Insights analysis saved to {analysis_file}")
+    return analysis
 
 def main():
     """Main function to run daily and weekly processing."""
     # Process daily newsletters
     process_daily_newsletters()
     
-    # Generate weekly summary (will only runs on Sundays)
-    generate_weekly_summary()
 
 if __name__ == "__main__":
     main()
