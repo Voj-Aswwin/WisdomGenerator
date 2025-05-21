@@ -216,7 +216,7 @@ def analyze_insights_trends():
     """
     
     # Generate analysis using Gemini
-    analysis = get_gemini_response(prompt, model_name="gemini-2.0-flash")
+    analysis = get_gemini_response(prompt, model_name="gemini-2.5-flash-preview-05-20")
     
     # Save the analysis as HTML
     today = datetime.now().strftime("%Y-%m-%d")
