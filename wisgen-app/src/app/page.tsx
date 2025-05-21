@@ -74,7 +74,6 @@ export default function Home() {
         throw new Error(data.error || data.message || 'Failed to pull newsletters');
       }
 
-      setSuccess(data.message || 'Newsletters pulled successfully');
       console.log('Newsletters pulled successfully:', data);
 
       // After successfully pulling newsletters, check for them
@@ -105,7 +104,6 @@ export default function Home() {
         throw new Error(data.error || data.message || 'Failed to analyze insights');
       }
 
-      setSuccess(data.message || 'Insights analysis generated successfully');
       console.log('Insights analysis generated:', data);
 
       // Set insights as generated so we can show "Read Deep Insights" button
@@ -256,10 +254,6 @@ export default function Home() {
 
               {error && (
                 <p className="mt-4 text-red-500 text-sm max-w-md text-center w-full">{error}</p>
-              )}
-
-              {success && (
-                <p className="mt-4 text-green-500 text-sm max-w-md text-center w-full">{success}</p>
               )}
             </div>
           </div>

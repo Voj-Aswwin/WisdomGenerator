@@ -74,12 +74,6 @@ export default function NewsletterPage() {
           >
             ← Back to Newsletters
           </ShimmerButton>
-          
-          {isProcessed && (
-            <span className="px-2 py-1 bg-green-100 text-green-800 text-sm rounded-md">
-              Processed Content
-            </span>
-          )}
         </div>
         
         {error && (

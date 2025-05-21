@@ -185,10 +185,15 @@ def analyze_insights_trends():
     
     # Create prompt for trend analysis - requesting HTML-formatted response
     prompt = f"""
+    You are a professional newsletter analyst. And Expert Explainer of news by building mental models and connecting the dots across sectors.
     I have some newsletters with me. Collect me some insights on them.
     I don't want plain summaries. I want you to go deep, find patterns across multiple newsletters, and give me key emerging trends you notice.
 
-    ✅ Avoid generic, overused statements like "AI is changing the world." Instead, explain specifically how such trends are unfolding—whether through new business models, shifts in user behavior, regulatory changes, or technological advancements.
+    ✅ Avoid generic, overused statements like "AI is changing the world." Instead, explain specifically how such trends 
+    are unfolding—whether through new business models, shifts in user behavior, regulatory changes, or technological advancements. 
+
+    Showcase first principles and second order effects with a brain emoji wherever relevant. 
+    Explain what the mental model means and how it relates to the current news. 
 
     ✅ Format your response with HTML tags for better display:
     - Use <h1>, <h2>, <h3> tags for section headers
@@ -196,15 +201,16 @@ def analyze_insights_trends():
     - Use <b> or <strong> tags for important points
     - Use <ul> and <li> tags for bullet points
     - Use <blockquote> for notable quotes or highlights
+    - The HTML should occupy the entire width of the screen.
     
     Structure your output clearly:
     - Start with a "TL;DR" section summarizing the key insights in 4–6 sentences.
     - Then go into detailed analysis using clear section headers.
+    - Important:When mentioning a news, give a brief about it in 3-4 lines. Dont expect the reader to have read the entire newsletter.
     - Use bullet points only when citing specific facts, numbers, or data points.
-    - End with a summary of the key trends for quick reference.
-
-    Be analytical, connect the dots across sectors, and highlight what's genuinely new or noteworthy—not what's obvious or widely known.
-
+    - End with a summary of the key trends for quick reference. In the Summary, Be analytical, connect the dots across sectors (Geopolitics, Technology, Business, Science, etc.) and across the newsletters, and highlight what's genuinely new or noteworthy—not what's obvious or widely known.
+    - Also at the end of the Summary, Ask some questions that would urge the reader to think about the news deeply and challenge their assumptions.
+    
     Newsletters:
     {combined_content}
     """
@@ -284,12 +290,3 @@ def analyze_insights_trends():
     
     print(f"Insights analysis saved to {analysis_file}")
     return analysis
-
-def main():
-    """Main function to run daily and weekly processing."""
-    # Process daily newsletters
-    process_daily_newsletters()
-    
-
-if __name__ == "__main__":
-    main()

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { ShimmerButton } from "@/components/magicui/shimmer-button";
 
@@ -10,19 +10,19 @@ export default function GenerateInsightsPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [insightsContent, setInsightsContent] = useState<string>('');
+  const hasRun = useRef(false); // Prevent double run in dev
 
   useEffect(() => {
-    // Run the Python script directly when the page loads
-    runPythonScript();
+    if (!hasRun.current) {
+      runPythonScript();
+      hasRun.current = true;
+    }
   }, []);
 
   const runPythonScript = async () => {
     try {
       setIsLoading(true);
       setError(null);
-      
-      // Show a simple loading message
-      setSuccess('Generating insights... This may take a minute.');
       
       // Create a timestamp to create a unique request (avoid caching)
       const timestamp = new Date().getTime();
@@ -34,9 +34,6 @@ export default function GenerateInsightsPage() {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to generate insights');
       }
-      
-      const data = await response.json();
-      setSuccess('Insights generated successfully!');
       
       // Now get the content
       const contentResponse = await fetch('/api/get-insights-content');
@@ -60,8 +57,16 @@ export default function GenerateInsightsPage() {
   };
 
   return (
-    <div className="container mx-auto p-8">
-      <div className="flex justify-between items-center mb-8">
+    <div
+      className="min-h-screen w-screen p-0 m-0 flex flex-col items-center"
+      style={{
+        backgroundImage: "url('/NewspaperBackground.png')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
+      <div className="flex justify-between items-center mb-8 px-8 pt-8 w-4/5">
         <h1 className="text-3xl font-bold">Insights Analysis</h1>
         <ShimmerButton
           className="rounded-xl bg-blue-100 px-6 py-3 font-medium text-blue-800 hover:bg-blue-200"
@@ -72,13 +77,12 @@ export default function GenerateInsightsPage() {
       </div>
 
       {isLoading ? (
-        <div className="flex flex-col justify-center items-center h-64">
+        <div className="flex flex-col justify-center items-center h-64 w-4/5">
           <div className="text-xl mb-4">Generating insights...</div>
           <div className="text-sm text-gray-500">This may take a minute or two.</div>
-          {success && <div className="mt-4 text-green-600">{success}</div>}
         </div>
       ) : error ? (
-        <div className="bg-red-100 p-6 rounded-lg text-red-700">
+        <div className="bg-red-100 p-6 rounded-lg text-red-700 w-4/5">
           <h2 className="text-xl font-bold mb-2">Error</h2>
           <p>{error}</p>
           <div className="mt-4">
@@ -91,14 +95,11 @@ export default function GenerateInsightsPage() {
           </div>
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-lg p-8 overflow-auto">
-          {success && <div className="mb-6 text-green-600">{success}</div>}
-          
-          <div className="insights-content">
-            {/* Render HTML content safely */}
+        <div className="bg-white/90 rounded-xl shadow-lg overflow-auto w-4/5">
+          <div className="insights-content w-full">
             <div 
               dangerouslySetInnerHTML={{ __html: insightsContent }} 
-              className="styled-insights"
+              className="styled-insights w-full px-8"
             />
           </div>
         </div>
