@@ -19,7 +19,7 @@ async function getLLMResponse(htmlContent: string) {
       },
       body: JSON.stringify({
         html: htmlContent,
-        modelName: 'gemini-2.0-flash'
+        modelName: 'gemini-2.5-flash-preview-05-20'
       })
     });
     

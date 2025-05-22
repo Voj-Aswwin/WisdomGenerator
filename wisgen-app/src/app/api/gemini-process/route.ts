@@ -6,7 +6,7 @@ import { existsSync } from 'fs';
 
 export async function POST(request: Request) {
   try {
-    const { html, modelName = "gemini-2.0-flash" } = await request.json();
+    const { html, modelName = "gemini-2.5-flash-preview-05-20" } = await request.json();
     
     if (!html) {
       return NextResponse.json({ 
