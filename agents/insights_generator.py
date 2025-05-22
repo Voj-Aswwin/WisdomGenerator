@@ -136,7 +136,7 @@ def process_daily_newsletters(messages=None, query=None, max_results=5):
             after_date = yesterday.strftime("%Y/%m/%d")
             
             # Updated query with the new email address
-            query = f"(from:newsletters@techcrunch.com OR from:newsletters@yourstory.com OR from:thedailybriefing@substack.com OR from:dailybrief@cfr.org) category:primary after:{after_date}"
+            query = f"(from:newsletters@techcrunch.com OR from:newsletters@yourstory.com OR from:thedailybriefing@substack.com OR from:dailybrief@cfr.org) category:primary after:{after_date} is:unread"
         
         service = get_gmail_service()
         results = service.users().messages().list(userId='me', q=query, maxResults=max_results).execute()
@@ -199,6 +199,7 @@ def analyze_insights_trends():
     - Use <h1>, <h2>, <h3> tags for section headers
     - Use <p> tags for paragraphs
     - Use <b> or <strong> tags for important points
+    - Use <img> tags for images
     - Use <ul> and <li> tags for bullet points
     - Use <blockquote> for notable quotes or highlights
     - The HTML should occupy the entire width of the screen.
@@ -216,7 +217,7 @@ def analyze_insights_trends():
     """
     
     # Generate analysis using Gemini
-    analysis = get_gemini_response(prompt, model_name="gemini-2.5-flash-preview-05-20")
+    analysis = get_gemini_response(prompt, model_name="gemini-2.0-flash")
     
     # Save the analysis as HTML
     today = datetime.now().strftime("%Y-%m-%d")

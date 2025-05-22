@@ -25,7 +25,7 @@ if __name__ == "__main__":
         from:thedailybriefing@substack.com OR 
         from:geopoliticsreport@substack.com OR 
         from:dailybrief@cfr.org) 
-        (category:primary OR category:updates) after:{after_date}"""
+        (category:primary OR category:updates) after:{after_date} is:unread"""
     
     print(f"Executing query: {query}")
     
